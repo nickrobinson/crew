@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:brainstorming)",
+      "WebFetch(domain:algora.io)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Skill(superpowers:writing-plans)",
+      "Bash(rails:*)",
+      "Bash(gem install:*)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(bundle install:*)"
+    ]
+  }
+}
