@@ -1,0 +1,105 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Profile -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-lg shadow p-6">
+        <div class="text-center mb-6">
+          <img src="<%= @developer.avatar_url %>" class="w-24 h-24 rounded-full mx-auto mb-4" alt="">
+          <h1 class="text-2xl font-bold text-gray-900"><%= @developer.name || @developer.github_username %></h1>
+          <p class="text-gray-500">@<%= @developer.github_username %></p>
+        </div>
+
+        <% if @developer.bio.present? %>
+          <p class="text-gray-600 mb-4"><%= @developer.bio %></p>
+        <% end %>
+
+        <dl class="space-y-3 text-sm">
+          <% if @developer.company.present? %>
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Company</dt>
+              <dd class="text-gray-900"><%= @developer.company %></dd>
+            </div>
+          <% end %>
+          <% if @developer.location.present? %>
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Location</dt>
+              <dd class="text-gray-900"><%= @developer.location %></dd>
+            </div>
+          <% end %>
+          <% if @developer.email.present? %>
+            <div class="flex justify-between">
+              <dt class="text-gray-500">Email</dt>
+              <dd><%= mail_to @developer.email, @developer.email, class: "text-indigo-600 hover:text-indigo-900" %></dd>
+            </div>
+          <% end %>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Followers</dt>
+            <dd class="text-gray-900"><%= number_with_delimiter(@developer.followers_count) %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-gray-500">Public Repos</dt>
+            <dd class="text-gray-900"><%= @developer.public_repos_count %></dd>
+          </div>
+        </dl>
+
+        <div class="mt-6">
+          <%= link_to "View on GitHub", @developer.profile_url, target: "_blank",
+              class: "block w-full text-center bg-gray-800 text-white px-4 py-2 rounded-md hover:bg-gray-900" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status & Notes -->
+    <div class="lg:col-span-2">
+      <!-- Status Update -->
+      <div class="bg-white rounded-lg shadow p-6 mb-8" id="developer_<%= @developer.id %>">
+        <h2 class="text-lg font-semibold mb-4">Tracking</h2>
+        <%= form_with model: @developer, class: "space-y-4" do |f| %>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <div class="flex gap-2">
+              <% Developer::STATUSES.each do |status| %>
+                <label class="cursor-pointer">
+                  <%= f.radio_button :status, status,
+                      class: "sr-only peer",
+                      onchange: "this.form.requestSubmit()" %>
+                  <span class="inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium
+                    peer-checked:bg-indigo-600 peer-checked:text-white
+                    bg-gray-100 text-gray-700 hover:bg-gray-200">
+                    <%= status.titleize.gsub("_", " ") %>
+                  </span>
+                </label>
+              <% end %>
+            </div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+            <%= f.text_area :notes, rows: 4,
+                placeholder: "Add your notes about this developer...",
+                class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+          </div>
+          <%= f.submit "Save Notes", class: "bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer" %>
+        <% end %>
+      </div>
+
+      <!-- Contributed Repositories -->
+      <div class="bg-white rounded-lg shadow">
+        <div class="px-6 py-4 border-b border-gray-200">
+          <h2 class="text-lg font-semibold">Contributed Repositories</h2>
+        </div>
+        <ul class="divide-y divide-gray-200">
+          <% @contributions.each do |contribution| %>
+            <li class="px-6 py-4 flex items-center justify-between">
+              <div>
+                <%= link_to contribution.repository.name, repository_path(contribution.repository),
+                    class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                <span class="text-sm text-gray-500 ml-2"><%= contribution.repository.primary_language %></span>
+              </div>
+              <span class="text-gray-900 font-medium"><%= contribution.contributions_count %> contributions</span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
