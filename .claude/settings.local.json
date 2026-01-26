@@ -12,7 +12,10 @@
       "Bash(bundle install:*)",
       "Bash(bin/rails routes:*)",
       "Bash(bin/rails db:migrate:*)",
-      "Bash(bin/rails runner:*)"
+      "Bash(bin/rails runner:*)",
+      "Bash(bin/rails solid_queue:install:*)",
+      "Bash(bin/rails:*)",
+      "Bash(ls:*)"
     ]
   }
 }
