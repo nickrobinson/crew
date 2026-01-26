@@ -1,0 +1,59 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <h1 class="text-3xl font-bold text-gray-900 mb-8">Talent Discovery</h1>
+
+  <!-- Quick Add Repository -->
+  <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-lg font-semibold mb-4">Add Repository</h2>
+    <%= form_with url: repositories_path, method: :post, class: "flex gap-4" do |f| %>
+      <%= f.text_field :github_url,
+          placeholder: "https://github.com/owner/repo",
+          class: "flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      <%= f.submit "Import", class: "bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-2xl font-bold text-gray-900"><%= @total_developers %></div>
+      <div class="text-gray-500">Total Developers</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-2xl font-bold text-green-600"><%= @developers_by_status["new"] || 0 %></div>
+      <div class="text-gray-500">New</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-2xl font-bold text-yellow-600"><%= @developers_by_status["interesting"] || 0 %></div>
+      <div class="text-gray-500">Interesting</div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <div class="text-2xl font-bold text-blue-600"><%= @developers_by_status["contacted"] || 0 %></div>
+      <div class="text-gray-500">Contacted</div>
+    </div>
+  </div>
+
+  <!-- Recent Imports -->
+  <div class="bg-white rounded-lg shadow">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-lg font-semibold">Recent Imports</h2>
+    </div>
+    <% if @recent_imports.any? %>
+      <ul class="divide-y divide-gray-200">
+        <% @recent_imports.each do |repo| %>
+          <li class="px-6 py-4 flex items-center justify-between">
+            <%= link_to repo.name, repository_path(repo), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+              <%= repo.import_status == 'imported' ? 'bg-green-100 text-green-800' :
+                  repo.import_status == 'importing' ? 'bg-yellow-100 text-yellow-800' :
+                  repo.import_status == 'failed' ? 'bg-red-100 text-red-800' :
+                  'bg-gray-100 text-gray-800' %>">
+              <%= repo.import_status %>
+            </span>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p class="px-6 py-4 text-gray-500">No repositories imported yet.</p>
+    <% end %>
+  </div>
+</div>
