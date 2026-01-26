@@ -15,7 +15,8 @@
       "Bash(bin/rails runner:*)",
       "Bash(bin/rails solid_queue:install:*)",
       "Bash(bin/rails:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(sqlite3:*)"
     ]
   }
 }

@@ -55,8 +55,9 @@ Rails.application.configure do
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
 
-  # Use Solid Queue for background job processing.
-  config.active_job.queue_adapter = :solid_queue
+  # Use async adapter for development - runs jobs immediately in-process.
+  # This avoids needing a separate queue database setup.
+  config.active_job.queue_adapter = :async
 
   # Highlight code that triggered redirect in logs.
   config.action_dispatch.verbose_redirect_logs = true
