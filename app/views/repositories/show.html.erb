@@ -1,0 +1,78 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-4 mb-2">
+      <h1 class="text-3xl font-bold text-gray-900"><%= @repository.name %></h1>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+        <%= @repository.import_status == 'imported' ? 'bg-green-100 text-green-800' :
+            @repository.import_status == 'importing' ? 'bg-yellow-100 text-yellow-800' :
+            @repository.import_status == 'failed' ? 'bg-red-100 text-red-800' :
+            'bg-gray-100 text-gray-800' %>">
+        <%= @repository.import_status %>
+      </span>
+    </div>
+    <p class="text-gray-600"><%= @repository.description %></p>
+    <div class="mt-2 flex gap-4 text-sm text-gray-500">
+      <span><%= @repository.primary_language %></span>
+      <span><%= number_with_delimiter(@repository.stars_count) %> stars</span>
+      <span><%= @repository.developers.count %> contributors</span>
+      <%= link_to "View on GitHub", @repository.github_url, target: "_blank", class: "text-indigo-600 hover:text-indigo-900" %>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="mb-6 flex gap-2">
+    <%= link_to "All", repository_path(@repository),
+        class: "px-3 py-1 rounded-md #{params[:status].blank? ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    <% Developer::STATUSES.each do |status| %>
+      <%= link_to status.titleize.gsub("_", " "), repository_path(@repository, status: status),
+          class: "px-3 py-1 rounded-md #{params[:status] == status ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
+    <% end %>
+  </div>
+
+  <!-- Contributors Table -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Developer</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contributions</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Followers</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @contributions.each do |contribution| %>
+          <% dev = contribution.developer %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <div class="flex items-center">
+                <img src="<%= dev.avatar_url %>" class="w-10 h-10 rounded-full mr-3" alt="">
+                <div>
+                  <%= link_to dev.name || dev.github_username, developer_path(dev), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                  <div class="text-sm text-gray-500">@<%= dev.github_username %></div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 text-gray-500"><%= dev.location || "-" %></td>
+            <td class="px-6 py-4 text-gray-900 font-medium"><%= contribution.contributions_count %></td>
+            <td class="px-6 py-4 text-gray-500"><%= number_with_delimiter(dev.followers_count) %></td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                <%= dev.status == 'new' ? 'bg-gray-100 text-gray-800' :
+                    dev.status == 'interesting' ? 'bg-yellow-100 text-yellow-800' :
+                    dev.status == 'contacted' ? 'bg-blue-100 text-blue-800' :
+                    'bg-red-100 text-red-800' %>">
+                <%= dev.status_label %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @contributions.empty? %>
+      <p class="px-6 py-8 text-center text-gray-500">No contributors found.</p>
+    <% end %>
+  </div>
+</div>

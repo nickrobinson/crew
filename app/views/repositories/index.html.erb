@@ -1,0 +1,55 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Repositories</h1>
+  </div>
+
+  <!-- Add Repository Form -->
+  <div class="bg-white rounded-lg shadow p-6 mb-8">
+    <h2 class="text-lg font-semibold mb-4">Add Repository</h2>
+    <%= form_with url: repositories_path, method: :post, class: "flex gap-4" do |f| %>
+      <%= f.text_field :github_url,
+          placeholder: "https://github.com/owner/repo",
+          class: "flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
+      <%= f.submit "Import", class: "bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer" %>
+    <% end %>
+  </div>
+
+  <!-- Repositories List -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repository</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Language</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stars</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contributors</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @repositories.each do |repo| %>
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4">
+              <%= link_to repo.name, repository_path(repo), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+            </td>
+            <td class="px-6 py-4 text-gray-500"><%= repo.primary_language || "-" %></td>
+            <td class="px-6 py-4 text-gray-500"><%= number_with_delimiter(repo.stars_count) %></td>
+            <td class="px-6 py-4 text-gray-500"><%= repo.developers.count %></td>
+            <td class="px-6 py-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                <%= repo.import_status == 'imported' ? 'bg-green-100 text-green-800' :
+                    repo.import_status == 'importing' ? 'bg-yellow-100 text-yellow-800' :
+                    repo.import_status == 'failed' ? 'bg-red-100 text-red-800' :
+                    'bg-gray-100 text-gray-800' %>">
+                <%= repo.import_status %>
+              </span>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @repositories.empty? %>
+      <p class="px-6 py-8 text-center text-gray-500">No repositories imported yet.</p>
+    <% end %>
+  </div>
+</div>
