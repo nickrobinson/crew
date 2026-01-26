@@ -9,7 +9,10 @@
       "Bash(rails:*)",
       "Bash(gem install:*)",
       "Skill(superpowers:subagent-driven-development)",
-      "Bash(bundle install:*)"
+      "Bash(bundle install:*)",
+      "Bash(bin/rails routes:*)",
+      "Bash(bin/rails db:migrate:*)",
+      "Bash(bin/rails runner:*)"
     ]
   }
 }
