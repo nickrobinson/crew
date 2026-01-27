@@ -1,13 +1,22 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <h1 class="text-3xl font-bold text-gray-900 mb-8">Developers</h1>
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Developers</h1>
+    <%= link_to export_project_developers_path(@project, request.query_parameters),
+        class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" do %>
+      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+      </svg>
+      Export CSV
+    <% end %>
+  </div>
 
   <!-- Filters -->
   <div class="bg-white rounded-lg shadow p-6 mb-8">
-    <%= form_with url: developers_path, method: :get, class: "flex flex-wrap gap-4 items-end" do |f| %>
+    <%= form_with url: project_developers_path(@project), method: :get, class: "flex flex-wrap gap-4 items-end" do |f| %>
       <div>
         <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
         <%= f.select :status,
-            [["All", ""]] + Developer::STATUSES.map { |s| [s.titleize.gsub("_", " "), s] },
+            [["All", ""]] + ProjectDeveloper::STATUSES.map { |s| [s.titleize.gsub("_", " "), s] },
             { selected: params[:status] },
             class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
       </div>
@@ -30,62 +39,63 @@
         <label class="text-sm text-gray-700">Has email</label>
       </div>
       <%= f.submit "Filter", class: "bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 cursor-pointer" %>
-      <%= link_to "Clear", developers_path, class: "text-gray-600 hover:text-gray-900 px-4 py-2" %>
+      <%= link_to "Clear", project_developers_path(@project), class: "text-gray-600 hover:text-gray-900 px-4 py-2" %>
     <% end %>
   </div>
 
   <!-- Developers Table -->
-  <div class="bg-white rounded-lg shadow overflow-hidden">
+  <div class="bg-white rounded-lg shadow overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Developer</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Location</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Repos</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Followers</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-56">Developer</th>
+          <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Contrib.</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Location</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">Company</th>
+          <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-20">Followers</th>
+          <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Status</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <% @developers.each do |dev| %>
+        <% @project_developers.each do |pd| %>
+          <% dev = pd.developer %>
           <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4">
+            <td class="px-4 py-3">
               <div class="flex items-center">
-                <img src="<%= dev.avatar_url %>" class="w-10 h-10 rounded-full mr-3" alt="">
-                <div>
-                  <%= link_to dev.name || dev.github_username, developer_path(dev), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
-                  <div class="text-sm text-gray-500">@<%= dev.github_username %></div>
+                <img src="<%= dev.avatar_url %>" class="w-8 h-8 rounded-full mr-2 flex-shrink-0" alt="">
+                <div class="min-w-0">
+                  <%= link_to dev.name || dev.github_username, project_developer_path(@project, dev), class: "text-indigo-600 hover:text-indigo-900 font-medium truncate block" %>
+                  <%= link_to "@#{dev.github_username}", dev.profile_url, target: "_blank", rel: "noopener", class: "text-xs text-gray-500 hover:text-gray-700 truncate block" %>
                 </div>
               </div>
             </td>
-            <td class="px-6 py-4 text-gray-500 text-sm"><%= dev.location || "-" %></td>
-            <td class="px-6 py-4 text-gray-500 text-sm"><%= dev.company || "-" %></td>
-            <td class="px-6 py-4 text-gray-500"><%= dev.repositories.count %></td>
-            <td class="px-6 py-4 text-gray-500"><%= number_with_delimiter(dev.followers_count) %></td>
-            <td class="px-6 py-4 text-sm">
+            <td class="px-4 py-3 text-right text-gray-900 font-medium whitespace-nowrap"><%= number_with_delimiter(pd.total_contributions_count.to_i) %></td>
+            <td class="px-4 py-3 text-gray-500 text-sm truncate max-w-28"><%= dev.location || "-" %></td>
+            <td class="px-4 py-3 text-gray-500 text-sm truncate max-w-28"><%= dev.company || "-" %></td>
+            <td class="px-4 py-3 text-right text-gray-500 whitespace-nowrap"><%= number_with_delimiter(dev.followers_count) %></td>
+            <td class="px-4 py-3 text-sm truncate max-w-40">
               <% if dev.email.present? %>
                 <%= mail_to dev.email, dev.email, class: "text-indigo-600 hover:text-indigo-900" %>
               <% else %>
                 <span class="text-gray-400">-</span>
               <% end %>
             </td>
-            <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                <%= dev.status == 'new' ? 'bg-gray-100 text-gray-800' :
-                    dev.status == 'interesting' ? 'bg-yellow-100 text-yellow-800' :
-                    dev.status == 'contacted' ? 'bg-blue-100 text-blue-800' :
+            <td class="px-4 py-3 text-center whitespace-nowrap">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium
+                <%= pd.status == 'new' ? 'bg-gray-100 text-gray-800' :
+                    pd.status == 'interesting' ? 'bg-yellow-100 text-yellow-800' :
+                    pd.status == 'contacted' ? 'bg-blue-100 text-blue-800' :
                     'bg-red-100 text-red-800' %>">
-                <%= dev.status_label %>
+                <%= pd.status_label %>
               </span>
             </td>
           </tr>
         <% end %>
       </tbody>
     </table>
-    <% if @developers.empty? %>
-      <p class="px-6 py-8 text-center text-gray-500">No developers found.</p>
+    <% if @project_developers.empty? %>
+      <p class="px-6 py-8 text-center text-gray-500">No developers found. Import a repository to discover candidates.</p>
     <% end %>
   </div>
 </div>

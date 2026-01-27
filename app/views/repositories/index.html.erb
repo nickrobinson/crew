@@ -6,7 +6,7 @@
   <!-- Add Repository Form -->
   <div class="bg-white rounded-lg shadow p-6 mb-8">
     <h2 class="text-lg font-semibold mb-4">Add Repository</h2>
-    <%= form_with url: repositories_path, method: :post, class: "flex gap-4" do |f| %>
+    <%= form_with url: project_repositories_path(@project), method: :post, class: "flex gap-4" do |f| %>
       <%= f.text_field :github_url,
           placeholder: "https://github.com/owner/repo",
           class: "flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
@@ -30,7 +30,7 @@
         <% @repositories.each do |repo| %>
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4">
-              <%= link_to repo.name, repository_path(repo), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+              <%= link_to repo.name, project_repository_path(@project, repo), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
             </td>
             <td class="px-6 py-4 text-gray-500"><%= repo.primary_language || "-" %></td>
             <td class="px-6 py-4 text-gray-500"><%= number_with_delimiter(repo.stars_count) %></td>

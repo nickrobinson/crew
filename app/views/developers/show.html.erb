@@ -6,7 +6,7 @@
         <div class="text-center mb-6">
           <img src="<%= @developer.avatar_url %>" class="w-24 h-24 rounded-full mx-auto mb-4" alt="">
           <h1 class="text-2xl font-bold text-gray-900"><%= @developer.name || @developer.github_username %></h1>
-          <p class="text-gray-500">@<%= @developer.github_username %></p>
+          <%= link_to "@#{@developer.github_username}", @developer.profile_url, target: "_blank", rel: "noopener", class: "text-gray-500 hover:text-gray-700" %>
         </div>
 
         <% if @developer.bio.present? %>
@@ -52,13 +52,13 @@
     <!-- Status & Notes -->
     <div class="lg:col-span-2">
       <!-- Status Update -->
-      <div class="bg-white rounded-lg shadow p-6 mb-8" id="developer_<%= @developer.id %>">
-        <h2 class="text-lg font-semibold mb-4">Tracking</h2>
-        <%= form_with model: @developer, class: "space-y-4" do |f| %>
+      <div class="bg-white rounded-lg shadow p-6 mb-8" id="project_developer_<%= @project_developer.id %>">
+        <h2 class="text-lg font-semibold mb-4">Tracking for <%= @project.name %></h2>
+        <%= form_with model: @project_developer, url: project_developer_path(@project, @developer), class: "space-y-4" do |f| %>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <div class="flex gap-2">
-              <% Developer::STATUSES.each do |status| %>
+              <% ProjectDeveloper::STATUSES.each do |status| %>
                 <label class="cursor-pointer">
                   <%= f.radio_button :status, status,
                       class: "sr-only peer",
@@ -85,20 +85,24 @@
       <!-- Contributed Repositories -->
       <div class="bg-white rounded-lg shadow">
         <div class="px-6 py-4 border-b border-gray-200">
-          <h2 class="text-lg font-semibold">Contributed Repositories</h2>
+          <h2 class="text-lg font-semibold">Contributions in <%= @project.name %></h2>
         </div>
-        <ul class="divide-y divide-gray-200">
-          <% @contributions.each do |contribution| %>
-            <li class="px-6 py-4 flex items-center justify-between">
-              <div>
-                <%= link_to contribution.repository.name, repository_path(contribution.repository),
-                    class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
-                <span class="text-sm text-gray-500 ml-2"><%= contribution.repository.primary_language %></span>
-              </div>
-              <span class="text-gray-900 font-medium"><%= contribution.contributions_count %> contributions</span>
-            </li>
-          <% end %>
-        </ul>
+        <% if @contributions.any? %>
+          <ul class="divide-y divide-gray-200">
+            <% @contributions.each do |contribution| %>
+              <li class="px-6 py-4 flex items-center justify-between">
+                <div>
+                  <%= link_to contribution.repository.name, project_repository_path(@project, contribution.repository),
+                      class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                  <span class="text-sm text-gray-500 ml-2"><%= contribution.repository.primary_language %></span>
+                </div>
+                <span class="text-gray-900 font-medium"><%= contribution.contributions_count %> contributions</span>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="px-6 py-4 text-gray-500">No contributions in this project's repositories.</p>
+        <% end %>
       </div>
     </div>
   </div>

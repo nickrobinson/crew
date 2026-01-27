@@ -1,6 +1,12 @@
 Rails.application.routes.draw do
-  root "dashboard#index"
+  root "projects#index"
 
-  resources :repositories, only: [:index, :show, :create]
-  resources :developers, only: [:index, :show, :update]
+  resources :projects do
+    resources :repositories, only: [:index, :show, :create]
+    resources :developers, only: [:index, :show, :update] do
+      collection do
+        get :export
+      end
+    end
+  end
 end

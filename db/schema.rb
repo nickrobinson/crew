@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_26_172650) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_26_182200) do
   create_table "contributions", force: :cascade do |t|
     t.integer "contributions_count", default: 0
     t.datetime "created_at", null: false
@@ -43,6 +43,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_172650) do
     t.index ["github_username"], name: "index_developers_on_github_username", unique: true
   end
 
+  create_table "project_developers", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "developer_id", null: false
+    t.text "notes"
+    t.integer "project_id", null: false
+    t.string "status", default: "new", null: false
+    t.datetime "updated_at", null: false
+    t.index ["developer_id"], name: "index_project_developers_on_developer_id"
+    t.index ["project_id", "developer_id"], name: "index_project_developers_on_project_id_and_developer_id", unique: true
+    t.index ["project_id"], name: "index_project_developers_on_project_id"
+  end
+
+  create_table "projects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "repositories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -51,11 +70,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_26_172650) do
     t.datetime "imported_at"
     t.string "name", null: false
     t.string "primary_language"
+    t.integer "project_id"
     t.integer "stars_count", default: 0
     t.datetime "updated_at", null: false
     t.index ["github_url"], name: "index_repositories_on_github_url", unique: true
+    t.index ["project_id"], name: "index_repositories_on_project_id"
   end
 
   add_foreign_key "contributions", "developers"
   add_foreign_key "contributions", "repositories"
+  add_foreign_key "project_developers", "developers"
+  add_foreign_key "project_developers", "projects"
+  add_foreign_key "repositories", "projects"
 end

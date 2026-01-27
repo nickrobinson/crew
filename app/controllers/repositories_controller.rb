@@ -1,16 +1,19 @@
 class RepositoriesController < ApplicationController
+  before_action :set_project
+
   def index
-    @repositories = Repository.order(created_at: :desc)
+    @repositories = @project.repositories.order(created_at: :desc)
   end
 
   def show
-    @repository = Repository.find(params[:id])
+    @repository = @project.repositories.find(params[:id])
     @contributions = @repository.contributions
                                 .includes(:developer)
                                 .order(contributions_count: :desc)
 
     if params[:status].present?
-      @contributions = @contributions.joins(:developer).where(developers: { status: params[:status] })
+      developer_ids = @project.project_developers.where(status: params[:status]).pluck(:developer_id)
+      @contributions = @contributions.where(developer_id: developer_ids)
     end
   end
 
@@ -20,20 +23,26 @@ class RepositoriesController < ApplicationController
     # Parse GitHub URL
     match = url.match(%r{github\.com/([^/]+)/([^/]+)})
     unless match
-      redirect_to repositories_path, alert: "Invalid GitHub URL"
+      redirect_to project_repositories_path(@project), alert: "Invalid GitHub URL"
       return
     end
 
     name = "#{match[1]}/#{match[2]}"
 
-    @repository = Repository.find_or_initialize_by(github_url: url)
+    @repository = @project.repositories.find_or_initialize_by(github_url: url)
     if @repository.new_record?
       @repository.name = name
       @repository.save!
       ImportRepositoryJob.perform_later(@repository.id)
-      redirect_to @repository, notice: "Import started for #{name}"
+      redirect_to project_repository_path(@project, @repository), notice: "Import started for #{name}"
     else
-      redirect_to @repository, notice: "Repository already exists"
+      redirect_to project_repository_path(@project, @repository), notice: "Repository already exists"
     end
+  end
+
+  private
+
+  def set_project
+    @project = Project.find(params[:project_id])
   end
 end

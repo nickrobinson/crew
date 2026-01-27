@@ -1,0 +1,33 @@
+<%= form_with model: project, class: "space-y-6" do |f| %>
+  <% if project.errors.any? %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+      <ul class="list-disc list-inside">
+        <% project.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= f.label :name, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_field :name,
+        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+        placeholder: "e.g., WASM Developer Role" %>
+  </div>
+
+  <div>
+    <%= f.label :description, class: "block text-sm font-medium text-gray-700 mb-1" %>
+    <%= f.text_area :description,
+        rows: 3,
+        class: "w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500",
+        placeholder: "Brief description of this recruiting project..." %>
+  </div>
+
+  <div class="flex justify-end gap-3">
+    <%= link_to "Cancel", (project.persisted? ? project_path(project) : projects_path),
+        class: "px-4 py-2 text-gray-700 hover:text-gray-900" %>
+    <%= f.submit project.persisted? ? "Update Project" : "Create Project",
+        class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 cursor-pointer" %>
+  </div>
+<% end %>

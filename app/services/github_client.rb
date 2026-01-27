@@ -1,3 +1,5 @@
+require "cgi"
+
 class GithubClient
   BASE_URL = "https://api.github.com"
 
@@ -43,7 +45,8 @@ class GithubClient
   end
 
   def user(username)
-    response = @conn.get("/users/#{username}")
+    encoded_username = CGI.escape(username)
+    response = @conn.get("/users/#{encoded_username}")
     handle_response(response)
   end
 

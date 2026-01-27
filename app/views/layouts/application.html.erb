@@ -18,12 +18,17 @@
           <div class="flex">
             <%= link_to "Talent Discovery", root_path, class: "flex items-center text-xl font-bold text-indigo-600" %>
             <div class="ml-10 flex items-center space-x-4">
-              <%= link_to "Dashboard", root_path,
-                  class: "px-3 py-2 rounded-md text-sm font-medium #{request.path == root_path ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
-              <%= link_to "Repositories", repositories_path,
-                  class: "px-3 py-2 rounded-md text-sm font-medium #{request.path.start_with?('/repositories') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
-              <%= link_to "Developers", developers_path,
-                  class: "px-3 py-2 rounded-md text-sm font-medium #{request.path.start_with?('/developers') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+              <%= link_to "Projects", projects_path,
+                  class: "px-3 py-2 rounded-md text-sm font-medium #{request.path == '/' || request.path == '/projects' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+              <% if @project&.persisted? %>
+                <span class="text-gray-300">|</span>
+                <%= link_to @project.name, project_path(@project),
+                    class: "px-3 py-2 rounded-md text-sm font-medium #{request.path == project_path(@project) ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+                <%= link_to "Repositories", project_repositories_path(@project),
+                    class: "px-3 py-2 rounded-md text-sm font-medium #{request.path.include?('/repositories') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+                <%= link_to "Developers", project_developers_path(@project),
+                    class: "px-3 py-2 rounded-md text-sm font-medium #{request.path.include?('/developers') ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
+              <% end %>
             </div>
           </div>
         </div>

@@ -64,5 +64,8 @@ end
 # HTTP client for API requests
 gem "faraday"
 
+# CSV support (bundled gem in Ruby 3.4+)
+gem "csv"
+
 # Load environment variables from .env
 gem "dotenv-rails", groups: [:development, :test]

@@ -22,10 +22,10 @@
 
   <!-- Filters -->
   <div class="mb-6 flex gap-2">
-    <%= link_to "All", repository_path(@repository),
+    <%= link_to "All", project_repository_path(@project, @repository),
         class: "px-3 py-1 rounded-md #{params[:status].blank? ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
-    <% Developer::STATUSES.each do |status| %>
-      <%= link_to status.titleize.gsub("_", " "), repository_path(@repository, status: status),
+    <% ProjectDeveloper::STATUSES.each do |status| %>
+      <%= link_to status.titleize.gsub("_", " "), project_repository_path(@project, @repository, status: status),
           class: "px-3 py-1 rounded-md #{params[:status] == status ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}" %>
     <% end %>
   </div>
@@ -45,12 +45,13 @@
       <tbody class="bg-white divide-y divide-gray-200">
         <% @contributions.each do |contribution| %>
           <% dev = contribution.developer %>
+          <% project_dev = @project.project_developers.find_by(developer: dev) %>
           <tr class="hover:bg-gray-50">
             <td class="px-6 py-4">
               <div class="flex items-center">
                 <img src="<%= dev.avatar_url %>" class="w-10 h-10 rounded-full mr-3" alt="">
                 <div>
-                  <%= link_to dev.name || dev.github_username, developer_path(dev), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
+                  <%= link_to dev.name || dev.github_username, project_developer_path(@project, dev), class: "text-indigo-600 hover:text-indigo-900 font-medium" %>
                   <div class="text-sm text-gray-500">@<%= dev.github_username %></div>
                 </div>
               </div>
@@ -59,13 +60,15 @@
             <td class="px-6 py-4 text-gray-900 font-medium"><%= contribution.contributions_count %></td>
             <td class="px-6 py-4 text-gray-500"><%= number_with_delimiter(dev.followers_count) %></td>
             <td class="px-6 py-4">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                <%= dev.status == 'new' ? 'bg-gray-100 text-gray-800' :
-                    dev.status == 'interesting' ? 'bg-yellow-100 text-yellow-800' :
-                    dev.status == 'contacted' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800' %>">
-                <%= dev.status_label %>
-              </span>
+              <% if project_dev %>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= project_dev.status == 'new' ? 'bg-gray-100 text-gray-800' :
+                      project_dev.status == 'interesting' ? 'bg-yellow-100 text-yellow-800' :
+                      project_dev.status == 'contacted' ? 'bg-blue-100 text-blue-800' :
+                      'bg-red-100 text-red-800' %>">
+                  <%= project_dev.status_label %>
+                </span>
+              <% end %>
             </td>
           </tr>
         <% end %>

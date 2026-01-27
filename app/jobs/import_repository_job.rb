@@ -4,10 +4,12 @@ class ImportRepositoryJob < ApplicationJob
   retry_on GithubClient::RateLimitError, wait: 5.minutes, attempts: 3
 
   def perform(repository_id)
+    Rails.logger.info "ImportRepositoryJob starting for repository #{repository_id}"
     repository = Repository.find(repository_id)
     client = GithubClient.new
 
     repository.update!(import_status: "importing")
+    Rails.logger.info "Importing repository: #{repository.name}"
 
     # Fetch repo metadata
     repo_data = client.repository(repository.owner, repository.repo_name)
@@ -25,10 +27,14 @@ class ImportRepositoryJob < ApplicationJob
     end
 
     repository.update!(import_status: "imported", imported_at: Time.current)
+    Rails.logger.info "ImportRepositoryJob completed for #{repository.name}"
 
-  rescue GithubClient::NotFoundError
+  rescue GithubClient::NotFoundError => e
+    Rails.logger.error "Repository not found: #{repository.name}"
     repository.update!(import_status: "failed")
   rescue => e
+    Rails.logger.error "ImportRepositoryJob failed for #{repository_id}: #{e.message}"
+    Rails.logger.error e.backtrace.first(10).join("\n")
     repository.update!(import_status: "failed")
     raise e
   end
@@ -36,8 +42,16 @@ class ImportRepositoryJob < ApplicationJob
   private
 
   def import_contributor(client, repository, contrib_data)
+    username = contrib_data["login"]
+
+    # Skip bot accounts - they're not real developers
+    if username.end_with?("[bot]")
+      Rails.logger.info "Skipping bot account: #{username}"
+      return
+    end
+
     # Fetch full user profile
-    user_data = client.user(contrib_data["login"])
+    user_data = client.user(username)
 
     # Find or create developer
     developer = Developer.find_or_initialize_by(github_id: user_data["id"])
@@ -62,6 +76,12 @@ class ImportRepositoryJob < ApplicationJob
     )
     contribution.contributions_count = contrib_data["contributions"]
     contribution.save!
+
+    # Create project_developer record if not exists
+    ProjectDeveloper.find_or_create_by!(
+      project: repository.project,
+      developer: developer
+    )
 
   rescue GithubClient::NotFoundError
     # User may have been deleted, skip

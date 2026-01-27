@@ -1,0 +1,17 @@
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Edit Project</h1>
+  </div>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= render "form", project: @project %>
+  </div>
+
+  <div class="mt-8 pt-8 border-t border-gray-200">
+    <h2 class="text-lg font-medium text-red-600 mb-4">Danger Zone</h2>
+    <%= button_to "Delete Project", project_path(@project),
+        method: :delete,
+        data: { turbo_confirm: "Are you sure? This will delete all repositories and candidate data for this project." },
+        class: "px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700" %>
+  </div>
+</div>
