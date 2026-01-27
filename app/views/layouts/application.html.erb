@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html class="h-full bg-gray-100">
   <head>
-    <title>Talent Discovery</title>
+    <title>Crew</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
@@ -16,7 +16,19 @@
       <div class="max-w-7xl mx-auto px-4">
         <div class="flex justify-between h-16">
           <div class="flex">
-            <%= link_to "Talent Discovery", root_path, class: "flex items-center text-xl font-bold text-indigo-600" %>
+            <%= link_to root_path, class: "flex items-center gap-2 text-xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors" do %>
+              <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Three person crew silhouettes in boat -->
+                <circle cx="7" cy="10" r="2" fill="currentColor"/>
+                <circle cx="12" cy="10" r="2" fill="currentColor"/>
+                <circle cx="17" cy="10" r="2" fill="currentColor"/>
+                <!-- Boat hull -->
+                <path d="M2 16 Q12 20 22 16 L20 18 Q12 21 4 18 Z" fill="currentColor"/>
+                <!-- Water wave -->
+                <path d="M3 21 Q7 19 12 21 Q17 23 21 21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+              </svg>
+              <span>Crew</span>
+            <% end %>
             <div class="ml-10 flex items-center space-x-4">
               <%= link_to "Projects", projects_path,
                   class: "px-3 py-2 rounded-md text-sm font-medium #{request.path == '/' || request.path == '/projects' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-500 hover:text-gray-700'}" %>
