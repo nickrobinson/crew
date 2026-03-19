@@ -7,10 +7,12 @@ class GithubClient
   class NotFoundError < StandardError; end
 
   def initialize(token = ENV["GITHUB_TOKEN"])
+    raise ArgumentError, "GITHUB_TOKEN environment variable is required" if token.blank?
+
     @conn = Faraday.new(url: BASE_URL) do |f|
       f.request :json
       f.response :json
-      f.headers["Authorization"] = "Bearer #{token}" if token
+      f.headers["Authorization"] = "Bearer #{token}"
       f.headers["Accept"] = "application/vnd.github+json"
       f.headers["X-GitHub-Api-Version"] = "2022-11-28"
     end
