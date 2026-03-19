@@ -1,0 +1,40 @@
+# syntax=docker/dockerfile:1
+
+# Development Dockerfile - run locally with:
+#   docker pull nickrobinson/crew:latest
+#   docker run -p 3000:3000 -e GITHUB_TOKEN=your_token_here nickrobinson/crew:latest
+#
+# Or build from source:
+#   docker build -f Dockerfile.dev -t crew-dev .
+#   docker run -p 3000:3000 -e GITHUB_TOKEN=your_token_here crew-dev
+
+ARG RUBY_VERSION=3.4.4
+FROM docker.io/library/ruby:$RUBY_VERSION-slim
+
+WORKDIR /rails
+
+# Install system dependencies (including build tools for native gems)
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential curl git libjemalloc2 libvips libyaml-dev \
+      pkg-config sqlite3 && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+ENV RAILS_ENV="development" \
+    BUNDLE_PATH="/usr/local/bundle"
+
+# Install gems
+COPY vendor/ ./vendor/
+COPY Gemfile Gemfile.lock ./
+RUN bundle install
+
+# Copy application code
+COPY . .
+
+# Prepare database and precompile Tailwind CSS
+RUN bin/rails db:prepare && \
+    bin/rails tailwindcss:build
+
+EXPOSE 3000
+
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

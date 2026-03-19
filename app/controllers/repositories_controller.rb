@@ -17,6 +17,23 @@ class RepositoriesController < ApplicationController
     end
   end
 
+  def destroy
+    @repository = @project.repositories.find(params[:id])
+
+    # Find developers who are ONLY linked to this repo within the project
+    repo_developer_ids = @repository.developers.pluck(:id)
+    other_repo_ids = @project.repositories.where.not(id: @repository.id).pluck(:id)
+    developers_in_other_repos = Contribution.where(repository_id: other_repo_ids, developer_id: repo_developer_ids).pluck(:developer_id).uniq
+    orphaned_developer_ids = repo_developer_ids - developers_in_other_repos
+
+    # Remove project_developer links for developers only discovered through this repo
+    @project.project_developers.where(developer_id: orphaned_developer_ids).destroy_all
+
+    @repository.destroy!
+
+    redirect_to project_repositories_path(@project), notice: "Repository and #{orphaned_developer_ids.size} developer(s) removed"
+  end
+
   def create
     url = params[:github_url].to_s.strip
 

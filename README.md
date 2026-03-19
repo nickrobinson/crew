@@ -25,7 +25,20 @@ Crew helps teams build developer pipelines by importing GitHub repositories and 
 - **HTTP Client**: Faraday (GitHub API)
 - **Deployment**: Docker / Kamal
 
-## Setup
+## Quick Start (Docker)
+
+The fastest way to run Crew locally. You just need Docker and a GitHub token.
+
+```bash
+docker pull nickrobinson/crew:latest
+docker run -p 3000:3000 -e GITHUB_TOKEN=your_token_here nickrobinson/crew:latest
+```
+
+Visit `http://localhost:3000`
+
+Generate a token at [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens) with `public_repo` scope.
+
+## Setup (from source)
 
 ### Prerequisites
 
@@ -36,14 +49,11 @@ Crew helps teams build developer pipelines by importing GitHub repositories and 
 ### Installation
 
 ```bash
-# Clone the repository
-git clone <repo-url>
+git clone https://github.com/nickrobinson/crew.git
 cd crew
 
-# Install dependencies
 bundle install
 
-# Configure environment
 cp .env.example .env  # or create .env manually
 ```
 
@@ -52,8 +62,6 @@ Add your GitHub token to `.env`:
 ```
 GITHUB_TOKEN=your_github_personal_access_token
 ```
-
-Generate a token at [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens) with `public_repo` scope.
 
 ### Database Setup
 
@@ -73,6 +81,13 @@ bin/rails tailwindcss:watch  # in another terminal
 ```
 
 Visit `http://localhost:3000`
+
+### Building the Docker Image Locally
+
+```bash
+docker build -f Dockerfile.dev -t crew-dev .
+docker run -p 3000:3000 -e GITHUB_TOKEN=your_token_here crew-dev
+```
 
 ## Usage
 
